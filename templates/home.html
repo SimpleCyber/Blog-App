@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Blogs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+  </head>
+  <body>
+    <h1>Hello Friends</h1>
+
+
+    <form method="GET" action="{{url_for('search')}}" style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+        <input type="text" name="q" placeholder="Search posts..." required/>
+        <button class="btn btn-edit" type="submit" style="height: 2.5rem; width: 5rem; text-align: center; justify-content: center; display: flex;">Search</button>
+    </form>
+
+
+    <ul class="blog-list">
+      {% for post in posts %}
+      <li class="blog-post">
+        <h2>{{ post.title}}</h2>
+        <p>{{ post.content}}</p>
+        <!-- handle image upload -->
+         {% if post.image %}
+         <img src="{{url_for('static', filename='uploads/' + post.image.replace('\\','/').split('/')[-1])}}" alt="Post Image" width="200">
+         {% endif %}
+
+
+        <!-- edit button -->
+        <a href="{{ url_for('edit_post', post_id =post.id)}}">
+            <button class="btn-edit">Edit</button>
+         </a>
+         
+        <!-- delete button -->
+         <a href="{{ url_for('delete_post', post_id =post.id)}}">
+            <button class="btn btn-delete" >Delete</button>
+         </a>
+         
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h3>Tags</h3>
+    {% for tag, count in tags_count.items() %}
+    <span class="tags" style="font-size:.9rem;">{{tag}}</span>
+    {% endfor %}
+
+    <a href="{{ url_for('add_post')}}">Add Post</a>
+
+  </body>
+</html>
