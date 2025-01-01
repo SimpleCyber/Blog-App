@@ -1,5 +1,0 @@
-django>=4.0,<5.0
-python-dotenv
-firebase-admin
-Markdown
-gunicorn
