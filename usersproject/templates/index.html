@@ -1,118 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand {
-            font-weight: 600;
-        }
-
-        .main-content {
-            padding: 2rem;
-        }
-
-        .welcome-section {
-            background: linear-gradient(to right, #f8f9fa, #e9ecef);
-            padding: 3rem 0;
-            border-radius: 10px;
-            margin: 2rem 0;
-        }
-
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #bb2d3b;
-            transform: translateY(-1px);
-        }
-        a{
-            text-decoration: none;
-            color: inherit;
-            cursor: default;
-        }
-        .pname{
-            color: green;
-            font-weight: bolder;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="#"><span class="pname">Django</span></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
-                </ul>
-                
-                <div class="d-flex align-items-center">
-                    <span class="me-3">Welcome, {{request.user}}</span>
-                    <a href="/logout"> <button class="btn logout-btn" onclick="logout()">
-                        Logout
-                    </button></a>
+{% extends "base.html" %}
+{% block main %}
+<main>
+    <!-- Most Recent Post -->
+    {% if recent_post %}
+        <div class="post">
+            <div class="postheader">
+                <div class="photo">
+                    <img id="recent-post-image" src="data:{{ recent_post.content_type }};base64,{{ recent_post.image }}" alt="Post Image" />
                 </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container main-content">
-        <div class="welcome-section text-center">
-            <h1>Welcome to <span class="pname">Django</span></h1>
-            <p class="lead">This is the best <b>django</b> starter kit ever.</p>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Quick Links</h5>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">My Profile</li>
-                            <li class="list-group-item">Settings</li>
-                            <li class="list-group-item">Help</li>
-                        </ul>
+                <div class="post_details">
+                    <div class="title">
+                        <span>Title:</span> <span id="recent-post-title">{{ recent_post.title }}</span>
+                    </div>
+                    <div class="summary">
+                        <span>Summary:</span> <span id="recent-post-summary">{{ recent_post.summary }}</span>
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Main Content</h5>
-                        <p class="card-text">This is where your main content will go. Add your specific content here.</p>
-                        <p> <strong>{{request.user}} ! </strong> Now u are free to make changes here :) </p>
-                    </div>
-                </div>
+            <div class="achive">
+                <h3 class="heading">Post Details</h3>
+                <div class="details" id="recent-post-details">{{ recent_post.content|safe }}</div>
             </div>
         </div>
+    {% else %}
+        <p>No recent post available.</p>
+    {% endif %}
+
+
+
+
+
+    <!-- Other Posts -->
+    <div class="blogs">
+        <h1 class="heading">Recent Posts</h1>
+        {% for post in posts %}
+        <div class="blog1" 
+             data-title="{{ post.title }}" 
+             data-summary="{{ post.summary }}" 
+             data-content="{{ post.content|safe }}" 
+             data-image="data:{{ post.content_type }};base64,{{ post.image }}">
+            <div class="blog_image">
+                <a href="#">
+                    <img src="data:{{ post.content_type }};base64,{{ post.image }}" alt="Post Image" />
+                </a>
+            </div>
+            <div class="blog_details">
+                <div class="header">{{ post.title }}</div>
+                <div class="details">{{ post.summary }}</div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function logout() {
-           wi
-        }
-    </script>
-</body>
-</html>
+</main>
+{% endblock main %}
+
+
+{% block js %}
+<script>
+    // JavaScript to update the recent post dynamically
+    document.querySelectorAll('.blog1').forEach(blog => {
+        blog.addEventListener('click', () => {
+            // Get post data from the clicked blog using data-* attributes
+            const title = blog.getAttribute('data-title');
+            const summary = blog.getAttribute('data-summary');
+            const content = blog.getAttribute('data-content');
+            const image = blog.getAttribute('data-image');
+
+            // Update the recent post section dynamically with clicked post data
+            document.getElementById('recent-post-title').textContent = title;
+            document.getElementById('recent-post-summary').textContent = summary;
+            document.getElementById('recent-post-details').innerHTML = content;
+            document.getElementById('recent-post-image').setAttribute('src', image);
+        });
+    });
+</script>
+{% endblock js %}
